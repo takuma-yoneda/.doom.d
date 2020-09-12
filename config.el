@@ -6,8 +6,8 @@
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets.
-(setq user-full-name "John Doe"
-      user-mail-address "john@doe.com")
+(setq user-full-name "Takuma Yoneda"
+      user-mail-address "takuma.ynd@gmail.com")
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
 ;; are the three important ones:
@@ -33,7 +33,15 @@
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
-(setq display-line-numbers-type t)
+(setq display-line-numbers-type nil)
+
+
+;; (use-package display-line-numbers
+;;   :ensure nil
+;;   :init
+;;   (setq display-line-numbers-width-start t)
+;;   (setq display-line-numbers-type t)
+;;   (global-display-line-numbers-mode))
 
 
 ;; Here are some additional functions/macros that could help you configure Doom:
@@ -52,3 +60,21 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
+
+(add-to-list 'default-frame-alist '(inhibit-double-buffering . t))
+
+;; Change font (https://github.com/hlissner/doom-emacs/blob/develop/docs/faq.org#how-do-i-change-the-fonts)
+(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
+      doom-variable-pitch-font (font-spec :family "Fira Code") ; inherits `doom-font''s :size
+      doom-unicode-font (font-spec :family "Fira Code" :size 12)
+      doom-big-font (font-spec :family "Fira Code" :size 19))
+
+(use-package hl-line+
+  :load-path "third-party"
+  :config
+  (hl-line-when-idle-interval 0.3)
+  (toggle-hl-line-when-idle 1))
+;; (setq-default hl-line-mode nil)
+
+;; I don't know how to disable hl-line mode in all modes...
+(add-hook 'python-mode-hook (lambda () (hl-line-mode -1)))
