@@ -50,3 +50,5 @@
 ;(unpin! t)
 
 (package! yapfify)
+(package! hl-line+
+  :recipe (:local-repo "thrid-party"))

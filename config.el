@@ -70,7 +70,6 @@
       doom-big-font (font-spec :family "Fira Code" :size 19))
 
 (use-package hl-line+
-  :load-path "third-party"
   :config
   (hl-line-when-idle-interval 0.3)
   (toggle-hl-line-when-idle 1))
