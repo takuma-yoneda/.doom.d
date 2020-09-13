@@ -69,11 +69,24 @@
       doom-unicode-font (font-spec :family "Fira Code" :size 12)
       doom-big-font (font-spec :family "Fira Code" :size 19))
 
+;; Several tricks to make emacs faster on Mac
+;; ref: https://github.com/hlissner/doom-emacs/issues/2217
+
+;; hl-line+ works much faster
 (use-package hl-line+
   :config
   (hl-line-when-idle-interval 0.3)
   (toggle-hl-line-when-idle 1))
 ;; (setq-default hl-line-mode nil)
+
+(use-package highlight-indent-guides
+  :ensure t
+  :delight highlight-indent-guides-mode
+  :init
+  (setq highlight-indent-guides-method 'character
+        ;; default is \x2502 but it is very slow on Mac
+        highlight-indent-guides-character ?\xFFE8
+        highlight-indent-guides-responsive 'top))
 
 ;; I don't know how to disable hl-line mode in all modes...
 (add-hook 'python-mode-hook (lambda () (hl-line-mode -1)))
