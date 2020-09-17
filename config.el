@@ -79,14 +79,18 @@
   (toggle-hl-line-when-idle 1))
 ;; (setq-default hl-line-mode nil)
 
-(use-package highlight-indent-guides
-  :ensure t
-  :delight highlight-indent-guides-mode
-  :init
-  (setq highlight-indent-guides-method 'character
-        ;; default is \x2502 but it is very slow on Mac
-        highlight-indent-guides-character ?\xFFE8
-        highlight-indent-guides-responsive 'top))
+;; (use-package highlight-indent-guides
+;;   :ensure t
+;;   :delight highlight-indent-guides-mode
+;;   :init
+;;   (setq highlight-indent-guides-method 'character
+;;         ;; default is \x2502 but it is very slow on Mac
+;;         highlight-indent-guides-character ?\xFFE8
+;;         highlight-indent-guides-responsive 'top))
 
-;; I don't know how to disable hl-line mode in all modes...
+;; I don't know how to disable these modes globally...
 (add-hook 'python-mode-hook (lambda () (hl-line-mode -1)))
+(add-hook 'python-mode-hook (lambda () (highlight-indent-guides-mode -1)))
+
+;; I'm not really sure where global-white-space mode is enabled... But I can just disable it here.
+(add-hook 'python-mode-hook (lambda () (global-whitespace-mode -1)))
