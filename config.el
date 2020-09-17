@@ -91,6 +91,3 @@
 ;; I don't know how to disable these modes globally...
 (add-hook 'python-mode-hook (lambda () (hl-line-mode -1)))
 (add-hook 'python-mode-hook (lambda () (highlight-indent-guides-mode -1)))
-
-;; I'm not really sure where global-white-space mode is enabled... But I can just disable it here.
-(add-hook 'python-mode-hook (lambda () (global-whitespace-mode -1)))
