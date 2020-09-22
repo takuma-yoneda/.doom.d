@@ -73,7 +73,7 @@
 ;; ref: https://github.com/hlissner/doom-emacs/issues/2217
 
 ;; hl-line+ works much faster
-(use-package hl-line+
+(use-package! hl-line+
   :config
   (hl-line-when-idle-interval 0.3)
   (toggle-hl-line-when-idle 1))
@@ -90,4 +90,19 @@
 
 ;; I don't know how to disable these modes globally...
 (add-hook 'python-mode-hook (lambda () (hl-line-mode -1)))
-(add-hook 'python-mode-hook (lambda () (highlight-indent-guides-mode -1)))
+
+;; Show the current function name in the header line
+(defun activate-which-function-mode ()
+  (which-function-mode)
+  (setq which-func-unknown "n/a")
+  (setq-default header-line-format
+                '((which-func-mode ("" which-func-format " "))))
+  (setq mode-line-misc-info
+        ;; We remove Which Function Mode from the mode line, because it's mostly
+        ;; invisible here anyway.
+        (assq-delete-all 'which-function-mode mode-line-misc-info))
+  )
+
+(add-hook 'python-mode-hook #'activate-which-function-mode)
+
+;; (add-hook 'python-mode-hook (lambda () (highlight-indent-guides-mode -1)))
