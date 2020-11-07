@@ -106,3 +106,15 @@
 (add-hook 'python-mode-hook #'activate-which-function-mode)
 
 ;; (add-hook 'python-mode-hook (lambda () (highlight-indent-guides-mode -1)))
+
+;; org-mode config
+(setq org-image-actual-width nil)
+
+;; create agenda from all files under ~/org/
+(setq my-org-agenda-dir "~/org")
+(setq org-agenda-files (list my-org-agenda-dir))
+;; leave timestamp when the task is completed
+(setq org-log-done 'time)
+;; set todo keywords
+;; (setq org-todo-keywords
+;;   '((sequence "TODO(t)" "SOMEDAY(s)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c@)")))
