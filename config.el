@@ -79,6 +79,10 @@
   (toggle-hl-line-when-idle 1))
 ;; (setq-default hl-line-mode nil)
 
+(use-package! python-black
+  :demand t
+  :after python)
+
 ;; (use-package highlight-indent-guides
 ;;   :ensure t
 ;;   :delight highlight-indent-guides-mode

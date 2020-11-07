@@ -52,3 +52,4 @@
 (package! yapfify)
 (package! hl-line+
   :recipe (:local-repo "thrid-party"))
+(package! python-black)
