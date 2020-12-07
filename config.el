@@ -64,9 +64,9 @@
 (add-to-list 'default-frame-alist '(inhibit-double-buffering . t))
 
 ;; Change font (https://github.com/hlissner/doom-emacs/blob/develop/docs/faq.org#how-do-i-change-the-fonts)
-(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
+(setq doom-font (font-spec :family "Fira Code" :size 11 :weight 'semi-light)
       doom-variable-pitch-font (font-spec :family "Fira Code") ; inherits `doom-font''s :size
-      doom-unicode-font (font-spec :family "Fira Code" :size 12)
+      doom-unicode-font (font-spec :family "Fira Code" :size 11)
       doom-big-font (font-spec :family "Fira Code" :size 19))
 
 ;; Several tricks to make emacs faster on Mac
@@ -79,10 +79,28 @@
   (toggle-hl-line-when-idle 1))
 ;; (setq-default hl-line-mode nil)
 
+;; (use-package! rotate-text
+;;   ;; :config
+;;   ;; (add-to-list 'rotate-text-words '("True" "False"))
+;;   )
+(map! :leader
+      (:prefix "t"
+        :desc "Rotate text"           "t" #'rotate-text
+        :desc "Rotate text backward"  "t" #'rotate-text-backward))
+
 (use-package! python-black
   :demand t
   :after python)
 
+(use-package! company-tabnine)
+(set-company-backend! 'python-mode #'company-tabnine)
+;; (add-to-list 'company-backends #'company-tabnine)
+
+(use-package beacon
+    :custom
+    (beacon-color "yellow")
+    :config
+    (beacon-mode 1))
 ;; (use-package highlight-indent-guides
 ;;   :ensure t
 ;;   :delight highlight-indent-guides-mode
@@ -109,6 +127,17 @@
 
 (add-hook 'python-mode-hook #'activate-which-function-mode)
 
+;; This is said to fix some issues on MacOS (https://github.com/pythonic-emacs/anaconda-mode#faq)
+(setq anaconda-mode-localhost-address "localhost")
+
+;;; Trigger completion immediately.
+(setq company-idle-delay 0)
+;; Number the candidates (use M-1, M-2 etc to select completions).
+(setq company-show-numbers t)
+
+;; activate yascroll
+(global-yascroll-bar-mode 1)
+
 ;; (add-hook 'python-mode-hook (lambda () (highlight-indent-guides-mode -1)))
 
 ;; org-mode config
@@ -122,3 +151,20 @@
 ;; set todo keywords
 ;; (setq org-todo-keywords
 ;;   '((sequence "TODO(t)" "SOMEDAY(s)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c@)")))
+
+
+;; window manipulation etc
+(map! :leader
+      :prefix "w"
+      "a" #'ace-window)
+(setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+(custom-set-faces
+ '(aw-leading-char-face
+   ((t (:foreground "#e1e143" :height 5.0)))))
+
+;; maimize on startup
+(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+
+
+;; load custom functions
+(load-file "~/.doom.d/custom_funcs.el")

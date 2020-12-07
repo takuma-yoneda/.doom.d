@@ -53,3 +53,6 @@
 (package! hl-line+
   :recipe (:local-repo "thrid-party"))
 (package! python-black)
+(package! company-tabnine)
+(package! beacon)
+(package! yascroll)
