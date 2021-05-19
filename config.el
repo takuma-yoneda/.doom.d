@@ -29,7 +29,7 @@
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/org/")
+(setq org-directory "~/Google Drive/org/")
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -64,10 +64,17 @@
 (add-to-list 'default-frame-alist '(inhibit-double-buffering . t))
 
 ;; Change font (https://github.com/hlissner/doom-emacs/blob/develop/docs/faq.org#how-do-i-change-the-fonts)
-(setq doom-font (font-spec :family "Fira Code" :size 11 :weight 'semi-light)
+;; (setq doom-font (font-spec :family "Fira Code" :size 11 :weight 'semi-light)
+(setq doom-font (font-spec :family "Fira Code" :size 11 :weight 'normal)
       doom-variable-pitch-font (font-spec :family "Fira Code") ; inherits `doom-font''s :size
       doom-unicode-font (font-spec :family "Fira Code" :size 11)
       doom-big-font (font-spec :family "Fira Code" :size 19))
+
+;; (setq doom-font (font-spec :family "Hack" :size 11 :weight 'normal)
+;;       doom-variable-pitch-font (font-spec :family "Hack") ; inherits `doom-font''s :size
+;;       doom-unicode-font (font-spec :family "Hack" :size 11)
+;;       doom-big-font (font-spec :family "Hack" :size 19))
+(setq doom-unicode-font doom-font)
 
 ;; Several tricks to make emacs faster on Mac
 ;; ref: https://github.com/hlissner/doom-emacs/issues/2217
@@ -86,21 +93,27 @@
 (map! :leader
       (:prefix "t"
         :desc "Rotate text"           "t" #'rotate-text
-        :desc "Rotate text backward"  "t" #'rotate-text-backward))
+        :desc "Rotate text backward"  "T" #'rotate-text-backward))
 
 (use-package! python-black
   :demand t
   :after python)
 
 (use-package! company-tabnine)
-(set-company-backend! 'python-mode #'company-tabnine)
+;; (set-company-backend! 'python-mode #'company-tabnine)
+;; I'm not sure why, but this is overwritten somewhere (maybe in anaconda-mode config.el?)
+(set-company-backend! 'anaconda-mode '(company-tabnine
+                                       :separate company-anaconda))
+;; On the other hand, this works fine :)
+(set-company-backend! 'python-mode '(company-tabnine
+                                       :with company-anaconda))
 ;; (add-to-list 'company-backends #'company-tabnine)
 
-(use-package beacon
-    :custom
-    (beacon-color "yellow")
-    :config
-    (beacon-mode 1))
+;; (use-package beacon
+;;     :custom
+;;     (beacon-color "yellow")
+;;     :config
+;;     (beacon-mode 1))
 ;; (use-package highlight-indent-guides
 ;;   :ensure t
 ;;   :delight highlight-indent-guides-mode
@@ -112,6 +125,7 @@
 
 ;; I don't know how to disable these modes globally...
 (add-hook 'python-mode-hook (lambda () (hl-line-mode -1)))
+(setq hl-line-mode -1)
 
 ;; Show the current function name in the header line
 (defun activate-which-function-mode ()
@@ -128,29 +142,127 @@
 (add-hook 'python-mode-hook #'activate-which-function-mode)
 
 ;; This is said to fix some issues on MacOS (https://github.com/pythonic-emacs/anaconda-mode#faq)
-(setq anaconda-mode-localhost-address "localhost")
+;; Also look at this issue: https://github.com/pythonic-emacs/anaconda-mode/issues/295
+(setq anaconda-mode-localhost-address "127.0.0.1")
 
 ;;; Trigger completion immediately.
-(setq company-idle-delay 0)
+(setq company-idle-delay 0.2)
 ;; Number the candidates (use M-1, M-2 etc to select completions).
 (setq company-show-numbers t)
 
+
+;; Settings for lsp-mode
+(setq lsp-enable-file-watchers nil)  ;; do not watch files
+(setq lsp-idle-delay 0.500)
 ;; activate yascroll
-(global-yascroll-bar-mode 1)
+;; This slows down scroll very much!!
+;; (global-yascroll-bar-mode 1)
+
+(use-package! eldoc-box
+  :config
+  (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-mode t))
 
 ;; (add-hook 'python-mode-hook (lambda () (highlight-indent-guides-mode -1)))
 
 ;; org-mode config
+(use-package! org-journal
+  :custom
+  (org-journal-dir "~/Google Drive/org/journal")
+  (org-journal-file-type 'weekly)  ;; journal weekly
+  (org-journal-carryover-items "") ;; Do not carry over last week TODOs
+  )
+
+(map! :leader
+      (:prefix "n"
+        :desc "Journal new entry"           "J" #'org-journal-new-entry
+        :desc "Journal open current entry"  "j" #'org-journal-open-current-journal-file))
+
 (setq org-image-actual-width nil)
 
-;; create agenda from all files under ~/org/
-(setq my-org-agenda-dir "~/org")
-(setq org-agenda-files (list my-org-agenda-dir))
+;; create agenda from all files under ~/Google Drive/org/
+(setq org-agenda-files (directory-files-recursively "~/Google Drive/org/" "\\.org$"))
+
 ;; leave timestamp when the task is completed
 (setq org-log-done 'time)
 ;; set todo keywords
 ;; (setq org-todo-keywords
 ;;   '((sequence "TODO(t)" "SOMEDAY(s)" "WAITING(w)" "|" "DONE(d)" "CANCELED(c@)")))
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "SOMEDAY(s)" "WAITING(w)" "IDEA(i)" "|" "DONE(d)" "CANCELLED(c)"))
+      org-todo-keyword-faces
+      '(("SOMEDAY"  . +org-todo-active)
+        ("WAITING" . +org-todo-onhold)
+        ("CANCELLED" . +org-todo-cancel)))
+
+;; Beautify org mode. This is taken from here (https://zzamboni.org/post/beautifying-org-mode-in-emacs/)
+(setq org-hide-emphasis-markers t)
+(use-package org-bullets
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+(custom-theme-set-faces
+ 'user
+ '(org-block ((t (:inherit fixed-pitch))))
+ '(org-code ((t (:inherit (shadow fixed-pitch)))))
+ '(org-document-info ((t (:foreground "dark orange"))))
+ '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+ '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
+ ;; '(org-link ((t (:foreground "sky blue" :underline t))))
+ '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+ '(org-property-value ((t (:inherit fixed-pitch))) t)
+ '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+ '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
+ '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
+ '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
+
+;; (let* ((variable-tuple
+;;           (cond ((x-list-fonts "ETBembo")         '(:font "ETBembo"))
+;;                 ((x-list-fonts "Source Sans Pro") '(:font "Source Sans Pro"))
+;;                 ((x-list-fonts "Lucida Grande")   '(:font "Lucida Grande"))
+;;                 ((x-list-fonts "Verdana")         '(:font "Verdana"))
+;;                 ((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
+;;                 (nil (warn "Cannot find a Sans Serif Font.  Install Source Sans Pro."))))
+;;          (base-font-color     (face-foreground 'default nil 'default))
+;;          (headline           `(:inherit default :weight bold :foreground ,base-font-color)))
+
+;;     (custom-theme-set-faces
+;;      'user
+;;      `(org-level-8 ((t (,@headline ,@variable-tuple))))
+;;      `(org-level-7 ((t (,@headline ,@variable-tuple))))
+;;      `(org-level-6 ((t (,@headline ,@variable-tuple))))
+;;      `(org-level-5 ((t (,@headline ,@variable-tuple))))
+;;      `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
+;;      `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.25))))
+;;      `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.5))))
+;;      `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.75))))
+;;      `(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil))))))
+
+
+(use-package! org-download
+  :after org
+  :defer nil
+  :custom
+  (org-download-method 'directory)
+  (org-download-image-dir "images")
+  (org-download-heading-lvl nil)
+  (org-download-timestamp "%Y%m%d-%H%M%S_"))
+  ;; (org-image-actual-width 300)
+  ;; (org-download-screenshot-method "/usr/local/bin/pngpaste %s")
+  ;; :bind
+  ;; ("C-M-y" . org-download-screenshot)
+  ;; :config
+  ;; (require 'org-download))
+
+(use-package! deft
+  :custom
+  (deft-directory "~/Google Drive/org/")
+  (deft-recursive t))
+
+;; magit related
+(after! magit
+  (map! :leader
+        :prefix "g"
+        :desc "Show file history" "h" #'magit-log-buffer-file))
 
 
 ;; window manipulation etc
@@ -163,8 +275,20 @@
    ((t (:foreground "#e1e143" :height 5.0)))))
 
 ;; maimize on startup
-(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+;; (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
+
+;; Workaround of a known issue of counsel (https://github.com/hlissner/doom-emacs/issues/3038#issuecomment-624165004)
+(after! counsel
+  (setq counsel-rg-base-command "rg -M 240 --with-filename --no-heading --line-number --color never %s || true"))
+
+(after! ivy-posframe
+  ;; overwrite default display func
+  (setf (alist-get t ivy-posframe-display-functions-alist)
+        #'+ivy-display-at-frame-center-near-bottom-fn)
+  )
+
+(good-scroll-mode 1)
 
 ;; load custom functions
 (load-file "~/.doom.d/custom_funcs.el")
