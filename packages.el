@@ -51,7 +51,7 @@
 
 (package! yapfify)
 (package! hl-line+
-  :recipe (:local-repo "thrid-party"))
+  :recipe (:local-repo "lisp"))
 (package! python-black)
 (package! company-tabnine)
 ;; (package! beacon)

@@ -33,7 +33,7 @@
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
-(setq display-line-numbers-type nil)
+(setq display-line-numbers-type t)
 
 
 ;; (use-package display-line-numbers
@@ -83,13 +83,13 @@
 (use-package! hl-line+
   :config
   (hl-line-when-idle-interval 0.3)
-  (toggle-hl-line-when-idle 1))
-;; (setq-default hl-line-mode nil)
+  (toggle-hl-line-when-idle 1)
+  (set-face-background hl-line-face "Black")
 
-;; (use-package! rotate-text
-;;   ;; :config
-;;   ;; (add-to-list 'rotate-text-words '("True" "False"))
-;;   )
+  ;; The way to disable global-hl-line-mode ((setq-default global-hl-line-mode nil) does NOT work!)
+  ;; https://github.com/hlissner/doom-emacs/issues/4206#issuecomment-734414502
+  (remove-hook 'doom-first-buffer-hook #'global-hl-line-mode))
+
 (map! :leader
       (:prefix "t"
         :desc "Rotate text"           "t" #'rotate-text
@@ -115,17 +115,12 @@
 ;;     :config
 ;;     (beacon-mode 1))
 ;; (use-package highlight-indent-guides
-;;   :ensure t
 ;;   :delight highlight-indent-guides-mode
 ;;   :init
 ;;   (setq highlight-indent-guides-method 'character
 ;;         ;; default is \x2502 but it is very slow on Mac
 ;;         highlight-indent-guides-character ?\xFFE8
 ;;         highlight-indent-guides-responsive 'top))
-
-;; I don't know how to disable these modes globally...
-(add-hook 'python-mode-hook (lambda () (hl-line-mode -1)))
-(setq hl-line-mode -1)
 
 ;; Show the current function name in the header line
 (defun activate-which-function-mode ()
@@ -146,7 +141,7 @@
 (setq anaconda-mode-localhost-address "127.0.0.1")
 
 ;;; Trigger completion immediately.
-(setq company-idle-delay 0.2)
+(setq company-idle-delay 0.15)
 ;; Number the candidates (use M-1, M-2 etc to select completions).
 (setq company-show-numbers t)
 
@@ -154,6 +149,9 @@
 ;; Settings for lsp-mode
 (setq lsp-enable-file-watchers nil)  ;; do not watch files
 (setq lsp-idle-delay 0.500)
+;; Use it only when debugging! It slows down a lsp server a lot.
+;; (setq-default lsp-log-io t)
+
 ;; activate yascroll
 ;; This slows down scroll very much!!
 ;; (global-yascroll-bar-mode 1)
@@ -292,3 +290,5 @@
 
 ;; load custom functions
 (load-file "~/.doom.d/custom_funcs.el")
+
+(setq ispell-dictionary "en_US")
