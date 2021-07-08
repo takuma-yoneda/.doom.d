@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: Typical way to read input in competitive programming
+# key: procin
+# uuid: wh
+# group: competitive programming
+# --
+${1:variables} = list(map(int, input().split()))
+$0

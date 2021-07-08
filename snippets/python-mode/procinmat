@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: procinmat
+# uuid: procinmat
+# key: procinmat
+# condition: t
+# --
+${1:matrix} = [list(map(int, input().split())) for _ in range(${2:height})])
+$0

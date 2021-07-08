@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: procinl
+# uuid: procinl
+# key: procinl
+# condition: t
+# --
+${1:vars} = zip(*[list(map(int, input().split())) for _ in range(${2:n})])
+$0
