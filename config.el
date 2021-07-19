@@ -65,7 +65,7 @@
 
 ;; Change font (https://github.com/hlissner/doom-emacs/blob/develop/docs/faq.org#how-do-i-change-the-fonts)
 ;; (setq doom-font (font-spec :family "Fira Code" :size 11 :weight 'semi-light)
-(setq doom-font (font-spec :family "Fira Code" :size 11 :weight 'normal)
+(setq doom-font (font-spec :family "Fira Code" :slant 'normal :size 11 :weight 'normal)
       doom-variable-pitch-font (font-spec :family "Fira Code") ; inherits `doom-font''s :size
       doom-unicode-font (font-spec :family "Fira Code" :size 11)
       doom-big-font (font-spec :family "Fira Code" :size 19))
