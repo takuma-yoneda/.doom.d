@@ -44,8 +44,8 @@
 
 
 ;; key mappings
-(map! :map python-mode-map
-      :localleader
-      :prefix ("d" . "debug")
-      :desc "Toggle breakpoint"
-      "b" #'spacemacs/python-toggle-breakpoint)
+;; (map! :map python-mode-map
+;;       :localleader
+;;       :prefix ("d" . "debug")
+;;       :desc "Toggle breakpoint"
+;;       "b" #'spacemacs/python-toggle-breakpoint)

@@ -51,7 +51,9 @@
 
 (package! yapfify)
 (package! hl-line+
-  :recipe (:local-repo "lisp"))
+  :recipe (:local-repo "lisp/hl-line-plus"))
+(package! orb-hide-markers
+  :recipe (:local-repo "lisp/orb-hide-markers"))
 (package! python-black)
 (package! company-tabnine)
 ;; (package! beacon)

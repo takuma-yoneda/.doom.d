@@ -29,7 +29,7 @@
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/Google Drive/org/")
+(setq org-directory "~/Synced/google-drive/org/")
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -123,34 +123,59 @@
 ;;         highlight-indent-guides-responsive 'top))
 
 ;; Show the current function name in the header line
-(defun activate-which-function-mode ()
-  (which-function-mode)
-  (setq which-func-unknown "n/a")
-  (setq-default header-line-format
-                '((which-func-mode ("" which-func-format " "))))
-  (setq mode-line-misc-info
-        ;; We remove Which Function Mode from the mode line, because it's mostly
-        ;; invisible here anyway.
-        (assq-delete-all 'which-function-mode mode-line-misc-info))
-  )
+;; 20211206 --- Deprecating it as I started to use lsp-headerline-breadcrumb
+;; (defun activate-which-function-mode ()
+;;   (which-function-mode)
+;;   (setq which-func-unknown "n/a")
+;;   (setq-default header-line-format
+;;                 '((which-func-mode ("" which-func-format " "))))
+;;   (setq mode-line-misc-info
+;;         ;; We remove Which Function Mode from the mode line, because it's mostly
+;;         ;; invisible here anyway.
+;;         (assq-delete-all 'which-function-mode mode-line-misc-info))
+;;   )
 
-(add-hook 'python-mode-hook #'activate-which-function-mode)
+;; (add-hook 'python-mode-hook #'activate-which-function-mode)
 
 ;; This is said to fix some issues on MacOS (https://github.com/pythonic-emacs/anaconda-mode#faq)
 ;; Also look at this issue: https://github.com/pythonic-emacs/anaconda-mode/issues/295
 (setq anaconda-mode-localhost-address "127.0.0.1")
 
 ;;; Trigger completion immediately.
-(setq company-idle-delay 0.15)
+(setq company-idle-delay 0)
+(setq company-echo-delay 0)
 ;; Number the candidates (use M-1, M-2 etc to select completions).
-(setq company-show-numbers t)
+(setq company-show-quick-access t)
 
 
-;; Settings for lsp-mode
-(setq lsp-enable-file-watchers nil)  ;; do not watch files
-(setq lsp-idle-delay 0.500)
-;; Use it only when debugging! It slows down a lsp server a lot.
-;; (setq-default lsp-log-io t)
+
+;; Settings for lsp-mode (add / overwrite original config)
+(use-package! lsp-mode
+  :config
+  (setq lsp-enable-file-watchers nil)  ;; do not watch files
+  (setq lsp-idle-delay 0.500)
+  (setq lsp-ui-doc-position 'top)
+  (setq lsp-headerline-breadcrumb-segments '(project file symbols))
+  (setq lsp-ui-imenu-auto-refresh t)
+  (setq lsp-headerline-breadcrumb-enable t)
+
+  ;; Use it only when debugging! It slows down a lsp server a lot.
+  ;; (setq-default lsp-log-io t)
+  )
+
+
+
+;; Activaete pipenv when projectile starts
+(setq pipenv-with-projectile t)
+
+;; (setq lsp-pylsp-configuration-sources '("pycodestyle" "flake8"))
+;; (setq lsp-pylsp-configuration-sources '["flake8" "pycodestyle"])
+;; (setq lsp-pylsp-plugins-flake8-ignore '(D100 D101 D102 D103 D107))
+;; (setq lsp-pylsp-plugins-flake8-ignore 'D103)
+;; D100 -
+;; (setq lsp-pylsp-plugins-pydocstyle-ignore ["D100" "D101"])
+;; (setq lsp-pylsp-plugins-flake8-executable "/Users/yoneda/.local/share/virtualenvs/model-free_private-7-RkLXJ5/bin/flake8")
+;; (setq lsp-pylsp-plugins-pylint-executable "/Users/yoneda/.local/share/virtualenvs/model-free_private-7-RkLXJ5/bin/pylint")
 
 ;; activate yascroll
 ;; This slows down scroll very much!!
@@ -165,8 +190,8 @@
 ;; org-mode config
 (use-package! org-journal
   :custom
-  (org-journal-dir "~/Google Drive/org/journal")
-  (org-journal-file-type 'weekly)  ;; journal weekly
+  (org-journal-dir "~/Synced/google-drive/org/journal")
+  (org-journal-file-type 'monthly)  ;; journal weekly
   (org-journal-carryover-items "") ;; Do not carry over last week TODOs
   )
 
@@ -177,8 +202,8 @@
 
 (setq org-image-actual-width nil)
 
-;; create agenda from all files under ~/Google Drive/org/
-(setq org-agenda-files (directory-files-recursively "~/Google Drive/org/" "\\.org$"))
+;; create agenda from all files under ~/Synced/google-drive/org/
+(setq org-agenda-files (directory-files-recursively "~/Synced/google-drive/org/" "\\.org$"))
 
 ;; leave timestamp when the task is completed
 (setq org-log-done 'time)
@@ -194,9 +219,14 @@
 
 ;; Beautify org mode. This is taken from here (https://zzamboni.org/post/beautifying-org-mode-in-emacs/)
 (setq org-hide-emphasis-markers t)
-(use-package org-bullets
+(use-package! org-bullets
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+(use-package! writeroom-mode
+  :config
+  (add-hook 'writeroom-mode-enable-hook (lambda () (display-line-numbers-mode -1)))
+  (add-hook 'writeroom-mode-disable-hook (lambda () (display-line-numbers-mode 1))))
 
 (custom-theme-set-faces
  'user
@@ -253,21 +283,29 @@
 
 (use-package! deft
   :custom
-  (deft-directory "~/Google Drive/org/")
+  (deft-directory "~/Synced/google-drive/org/")
   (deft-recursive t))
+
+(use-package! orb-hide-markers
+  :custom
+  (setq-default org-babel-hide-markers-line t))
 
 ;; magit related
 (after! magit
   (map! :leader
         :prefix "g"
         :desc "Show file history" "h" #'magit-log-buffer-file))
-
+(map! :leader
+      :prefix "o"
+      :desc "Other frame" "t" #'other-frame)
 
 ;; window manipulation etc
-(map! :leader
-      :prefix "w"
-      "a" #'ace-window)
-(setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+;; (map! :leader
+;;       :prefix "w"
+;;       "a" #'ace-window)
+;; (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+
+;; Ace window
 (custom-set-faces
  '(aw-leading-char-face
    ((t (:foreground "#e1e143" :height 5.0)))))
@@ -287,8 +325,25 @@
   )
 
 (good-scroll-mode 1)
+(setq text-scale-mode-step 1.1)
 
 ;; load custom functions
-(load-file "~/.doom.d/custom_funcs.el")
+;; (load-file "~/.doom.d/custom_funcs.el")
 
-(setq ispell-dictionary "en_US")
+(setq-default truncate-lines t)
+
+(setq ispell-dictionary "en_US.multi")
+
+;; Globally disable writegood mode
+(writegood-mode -1)
+
+
+;; Temporary for model-free project!
+(setenv "PYTHONPATH" (expand-file-name "~/workspace/model-free_private"))
+
+
+;; (map! :leader
+;;       :desc "Org-timer"
+;;       "<f1>" #'+hydra/org-timer/body)
+
+(global-set-key (kbd "<f1>") '+hydra/org-timer/body)
