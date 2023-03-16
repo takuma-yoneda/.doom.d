@@ -1,5 +1,6 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
+
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
 
@@ -43,6 +44,11 @@
 ;;   (setq display-line-numbers-type t)
 ;;   (global-display-line-numbers-mode))
 
+;; dired
+(after! dired-rsync
+  (setq-default dired-rsync-unmark-on-completion nil)
+  (setq-default dired-rsync-options "-az --info=progress2 --update")
+  )
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
@@ -65,10 +71,18 @@
 
 ;; Change font (https://github.com/hlissner/doom-emacs/blob/develop/docs/faq.org#how-do-i-change-the-fonts)
 ;; (setq doom-font (font-spec :family "Fira Code" :size 11 :weight 'semi-light)
-(setq doom-font (font-spec :family "Fira Code" :slant 'normal :size 11 :weight 'normal)
-      doom-variable-pitch-font (font-spec :family "Fira Code") ; inherits `doom-font''s :size
-      doom-unicode-font (font-spec :family "Fira Code" :size 11)
-      doom-big-font (font-spec :family "Fira Code" :size 19))
+;; (setq doom-font (font-spec :family "Fira Code" :slant 'normal :size 11 :weight 'normal)
+;;       doom-variable-pitch-font (font-spec :family "Fira Code") ; inherits `doom-font''s :size
+;;       doom-unicode-font (font-spec :family "Fira Code" :size 11)
+;;       doom-big-font (font-spec :family "Fira Code" :size 19))
+
+
+;; Temporarily try this:
+(setq doom-font (font-spec :family "JetBrains Mono" :size 12)
+      doom-big-font (font-spec :family "JetBrains Mono" :size 18)
+      doom-variable-pitch-font (font-spec :family "Overpass" :size 12)
+      doom-unicode-font (font-spec :family "JuliaMono")
+      doom-serif-font (font-spec :family "IBM Plex Mono" :weight 'light))
 
 ;; (setq doom-font (font-spec :family "Hack" :size 11 :weight 'normal)
 ;;       doom-variable-pitch-font (font-spec :family "Hack") ; inherits `doom-font''s :size
@@ -76,19 +90,68 @@
 ;;       doom-big-font (font-spec :family "Hack" :size 19))
 (setq doom-unicode-font doom-font)
 
+
 ;; Several tricks to make emacs faster on Mac
 ;; ref: https://github.com/hlissner/doom-emacs/issues/2217
 
 ;; hl-line+ works much faster
-(use-package! hl-line+
-  :config
-  (hl-line-when-idle-interval 0.3)
-  (toggle-hl-line-when-idle 1)
-  (set-face-background hl-line-face "Black")
+;; (use-package! hl-line-plus
+;;   :config
+;;   (hl-line-when-idle-interval 0.3)
+;;   (toggle-hl-line-when-idle 1)
+;;   (set-face-background hl-line-face "Black")
 
-  ;; The way to disable global-hl-line-mode ((setq-default global-hl-line-mode nil) does NOT work!)
-  ;; https://github.com/hlissner/doom-emacs/issues/4206#issuecomment-734414502
-  (remove-hook 'doom-first-buffer-hook #'global-hl-line-mode))
+;;   ;; The way to disable global-hl-line-mode ((setq-default global-hl-line-mode nil) does NOT work!)
+;;   ;; https://github.com/hlissner/doom-emacs/issues/4206#issuecomment-734414502
+;;   (remove-hook 'doom-first-buffer-hook #'global-hl-line-mode))
+
+
+;; Better defaults (https://tecosaur.github.io/emacs-config/config.html#better-defaults)
+(setq
+ evil-want-fine-undo t          ; By default while in insert all changes are one big blob. Be more granular
+ truncate-string-ellipsis "…")  ; Unicode ellispis are nicer than "...", and also save /precious/ space
+
+(global-subword-mode +1)
+(setq-default evil-escape-key-sequence "fd")  ; Exit insert state with fd (just like spacemacs)
+
+;; Set default frame size
+(add-to-list 'default-frame-alist '(height . 24))
+(add-to-list 'default-frame-alist '(width . 80))
+
+;; Use orange color in modeline to note for unsaved buffer
+(custom-set-faces!
+  '(doom-modeline-buffer-modified :foreground "orange"))
+
+;; Use simpler keys in dashboard
+(map! :map +doom-dashboard-mode-map
+      :ne "f" #'find-file
+      :ne "r" #'counsel-recentf
+      :ne "p" #'counsel-projectile-switch-project
+      :ne "P" #'doom/open-private-config
+      :ne "c" (cmd! (find-file (expand-file-name "config.el" doom-private-dir)))
+      :ne "i" (cmd! (find-file (expand-file-name "init.el" doom-private-dir)))
+      :ne "." (cmd! (doom-project-find-file "~/.config/")) ; . for dotfiles
+      :ne "b" #'+ivy/switch-workspace-buffer
+      :ne "B" #'+ivy/switch-buffer
+      :ne "q" #'save-buffers-kill-terminal)
+
+;; whichkey setup
+(setq
+ which-key-idle-delay 0.5
+ which-key-idle-secondary-delay 0.1
+ which-key-allow-evil-operators nil)
+
+(setq-default history-length 1000
+              prescient-history-length 1000)
+
+;; Nested snippets are good, so let’s enable that.
+(setq yas-triggers-in-field t)
+
+;; Colorize info page
+(use-package! info-colors
+  :commands (info-colors-fontify-node)
+  :config (add-hook 'Info-selection-hook 'info-colors-fontify-node))
+
 
 (map! :leader
       (:prefix "t"
@@ -99,14 +162,14 @@
   :demand t
   :after python)
 
-(use-package! company-tabnine)
+;; (use-package! company-tabnine)
 ;; (set-company-backend! 'python-mode #'company-tabnine)
 ;; I'm not sure why, but this is overwritten somewhere (maybe in anaconda-mode config.el?)
-(set-company-backend! 'anaconda-mode '(company-tabnine
-                                       :separate company-anaconda))
+;; (set-company-backend! 'anaconda-mode '(company-tabnine
+;;                                        :separate company-anaconda))
 ;; On the other hand, this works fine :)
-(set-company-backend! 'python-mode '(company-tabnine
-                                       :with company-anaconda))
+;; (set-company-backend! 'python-mode '(company-tabnine
+;;                                        :with company-anaconda))
 ;; (add-to-list 'company-backends #'company-tabnine)
 
 ;; (use-package beacon
@@ -141,8 +204,11 @@
 ;; Also look at this issue: https://github.com/pythonic-emacs/anaconda-mode/issues/295
 (setq anaconda-mode-localhost-address "127.0.0.1")
 
+;; dap mode config
+(after! dap-mode
+  (setq dap-python-debugger 'debugpy))
+
 ;;; Trigger completion immediately.
-(setq company-idle-delay 0)
 (setq company-echo-delay 0)
 ;; Number the candidates (use M-1, M-2 etc to select completions).
 (setq company-show-quick-access t)
@@ -150,23 +216,31 @@
 
 
 ;; Settings for lsp-mode (add / overwrite original config)
-(use-package! lsp-mode
-  :config
-  (setq lsp-enable-file-watchers nil)  ;; do not watch files
-  (setq lsp-idle-delay 0.500)
-  (setq lsp-ui-doc-position 'top)
-  (setq lsp-headerline-breadcrumb-segments '(project file symbols))
-  (setq lsp-ui-imenu-auto-refresh t)
-  (setq lsp-headerline-breadcrumb-enable t)
+;; (use-package! lsp-mode
+;;   :config
+;;   (setq lsp-enable-file-watchers nil)  ;; do not watch files
+;;   (setq lsp-idle-delay 0.500)
+;;   (setq lsp-ui-doc-position 'top)
+;;   (setq lsp-headerline-breadcrumb-segments '(project file symbols))
+;;   (setq lsp-ui-imenu-auto-refresh t)
+;;   (setq lsp-headerline-breadcrumb-enable t)
 
-  ;; Use it only when debugging! It slows down a lsp server a lot.
-  ;; (setq-default lsp-log-io t)
-  )
+;;   ;; Use it only when debugging! It slows down a lsp server a lot.
+;;   ;; (setq-default lsp-log-io t)
+;;   )
+;; Enable breadcrumb
+(setq lsp-headerline-breadcrumb-enable t)
+(setq lsp-headerline-breadcrumb-segments '(project file symbols))
 
+(setq lsp-ui-doc-show-with-cursor nil)
+;; Default is nil. This forces lsp ui to show peek window even when there is only a unique symbol.
+(setq lsp-ui-peek-always-show t)
 
 
 ;; Activaete pipenv when projectile starts
 (setq pipenv-with-projectile t)
+;; Display current project only (https://github.com/Alexander-Miller/treemacs/issues/660)
+;; (add-hook 'projectile-after-switch-project-hook 'treemacs-display-current-project-exclusively)  ;; This fails for some reason..
 
 ;; (setq lsp-pylsp-configuration-sources '("pycodestyle" "flake8"))
 ;; (setq lsp-pylsp-configuration-sources '["flake8" "pycodestyle"])
@@ -174,16 +248,14 @@
 ;; (setq lsp-pylsp-plugins-flake8-ignore 'D103)
 ;; D100 -
 ;; (setq lsp-pylsp-plugins-pydocstyle-ignore ["D100" "D101"])
-;; (setq lsp-pylsp-plugins-flake8-executable "/Users/yoneda/.local/share/virtualenvs/model-free_private-7-RkLXJ5/bin/flake8")
-;; (setq lsp-pylsp-plugins-pylint-executable "/Users/yoneda/.local/share/virtualenvs/model-free_private-7-RkLXJ5/bin/pylint")
 
 ;; activate yascroll
 ;; This slows down scroll very much!!
 ;; (global-yascroll-bar-mode 1)
 
-(use-package! eldoc-box
-  :config
-  (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-mode t))
+;; (use-package! eldoc-box
+;;   :config
+;;   (add-hook 'eglot--managed-mode-hook #'eldoc-box-hover-mode t))
 
 ;; (add-hook 'python-mode-hook (lambda () (highlight-indent-guides-mode -1)))
 
@@ -217,36 +289,41 @@
         ("WAITING" . +org-todo-onhold)
         ("CANCELLED" . +org-todo-cancel)))
 
+
+
+
+
 ;; Beautify org mode. This is taken from here (https://zzamboni.org/post/beautifying-org-mode-in-emacs/)
 (setq org-hide-emphasis-markers t)
-(use-package! org-bullets
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+;; (use-package! org-bullets
+;;   :config
+;;   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
-(use-package! writeroom-mode
-  :config
-  (add-hook 'writeroom-mode-enable-hook (lambda () (display-line-numbers-mode -1)))
-  (add-hook 'writeroom-mode-disable-hook (lambda () (display-line-numbers-mode 1))))
+;; (use-package! writeroom-mode
+;;   :config
+;;   (add-hook 'writeroom-mode-enable-hook (lambda () (display-line-numbers-mode -1)))
+;;   (add-hook 'writeroom-mode-disable-hook (lambda () (display-line-numbers-mode 1))))
 
-(custom-theme-set-faces
- 'user
- '(org-block ((t (:inherit fixed-pitch))))
- '(org-code ((t (:inherit (shadow fixed-pitch)))))
- '(org-document-info ((t (:foreground "dark orange"))))
- '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
- '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
- ;; '(org-link ((t (:foreground "sky blue" :underline t))))
- '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
- '(org-property-value ((t (:inherit fixed-pitch))) t)
- '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
- '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
- '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
- '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
+;; (custom-theme-set-faces
+;;  'user
+;;  '(org-block ((t (:inherit fixed-pitch))))
+;;  '(org-code ((t (:inherit (shadow fixed-pitch)))))
+;;  '(org-document-info ((t (:foreground "dark orange"))))
+;;  '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+;;  '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
+;;  ;; '(org-link ((t (:foreground "sky blue" :underline t))))
+;;  '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+;;  '(org-property-value ((t (:inherit fixed-pitch))) t)
+;;  '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+;;  '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
+;;  '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
+;;  '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
 
 ;; (let* ((variable-tuple
 ;;           (cond ((x-list-fonts "ETBembo")         '(:font "ETBembo"))
 ;;                 ((x-list-fonts "Source Sans Pro") '(:font "Source Sans Pro"))
-;;                 ((x-list-fonts "Lucida Grande")   '(:font "Lucida Grande"))
+;;                 ((x-
+;; list-fonts "Lucida Grande")   '(:font "Lucida Grande"))
 ;;                 ((x-list-fonts "Verdana")         '(:font "Verdana"))
 ;;                 ((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
 ;;                 (nil (warn "Cannot find a Sans Serif Font.  Install Source Sans Pro."))))
@@ -318,28 +395,44 @@
 (after! counsel
   (setq counsel-rg-base-command "rg -M 240 --with-filename --no-heading --line-number --color never %s || true"))
 
+;; Workaround of counsel-rg issue (https://github.com/hlissner/doom-emacs/issues/3038#issuecomment-929996064)
+;; (defadvice! +ivy--always-return-zero-exit-code-a (fn &rest args)
+;;   :around #'counsel-rg
+;;   (letf! (defun process-exit-status (_proc)
+;;            (let ((code (funcall process-exit-status proc)))
+;;              (if (= code 2) 0 code)))
+;;     (apply fn args)))
+
+;; SPC-& to search project from current dir.  (<-> SPC-* to search entire project)
+(map! :leader "&" '+ivy/project-search-from-cwd)
+
 (after! ivy-posframe
   ;; overwrite default display func
   (setf (alist-get t ivy-posframe-display-functions-alist)
         #'+ivy-display-at-frame-center-near-bottom-fn)
   )
 
-(good-scroll-mode 1)
+;; (good-scroll-mode 1)
 (setq text-scale-mode-step 1.1)
 
 ;; load custom functions
 ;; (load-file "~/.doom.d/custom_funcs.el")
 
-(setq-default truncate-lines t)
+;; (setq-default truncate-lines t)
 
 (setq ispell-dictionary "en_US.multi")
+
+;; Set spell-fu incorrect face
+(after! spell-fu
+  (set-face-attribute 'spell-fu-incorrect-face nil
+                      :underline '(:color "orange" :style wave)))
 
 ;; Globally disable writegood mode
 (writegood-mode -1)
 
 
 ;; Temporary for model-free project!
-(setenv "PYTHONPATH" (expand-file-name "~/workspace/model-free_private"))
+;; (setenv "PYTHONPATH" (expand-file-name "~/workspace/model-free_private"))
 
 
 ;; (map! :leader
@@ -347,3 +440,33 @@
 ;;       "<f1>" #'+hydra/org-timer/body)
 
 (global-set-key (kbd "<f1>") '+hydra/org-timer/body)
+
+;; writegood-mode
+(writegood-passive-voice-turn-off)
+
+(map! "C-s" 'save-buffer)
+
+;; eshell config
+;; use (pcomplete-std-complete) for completion (https://emacs.stackexchange.com/a/27871/30129)
+(add-hook 'eshell-mode-hook
+          (lambda ()
+            (define-key eshell-mode-map (kbd "<tab>")
+              (lambda () (interactive) (pcomplete-std-complete)))))
+;; Whether to scroll to the bottom when a new output comes in.
+;; 'other --> enables this only when the window is not selected
+(setq eshell-scroll-to-bottom-on-output 'other)
+
+;; ssh-deploy
+(use-package! ssh-deploy
+  :config
+  (ssh-deploy-line-mode)
+  (ssh-deploy-add-menu))
+
+;; Configure hl-todo (https://docs.doomemacs.org/latest/modules/ui/hl-todo/)
+;; TEMP is in the original value, but doomemacs overwrites (removes) it.
+;; (after! hl-todo
+;;   (setq hl-todo-keyword-faces
+;; 	`(("TEMP" . "#d0bf8f")
+;; 	  )))
+
+(add-to-list 'auto-mode-alist '("\\.mdx\\'" . markdown-mode))

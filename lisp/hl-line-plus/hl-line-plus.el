@@ -1,6 +1,6 @@
-;;; hl-line+.el --- Extensions to hl-line.el.
+;;; hl-line-plus.el --- extensions to hl-line.el.
 ;;
-;; Filename: hl-line+.el
+;; Filename: hl-line-plus.el
 ;; Description: Extensions to hl-line.el.
 ;; Author: Drew Adams
 ;; Maintainer: Drew Adams (concat "drew.adams" "@" "oracle" ".com")
@@ -70,7 +70,7 @@
 ;;
 ;;  * `crosshairs.el', which highlights the current line and the
 ;;    current column, at the same time.  It requires libraries
-;;    `col-highlight.el' and `hl-line+.el'.
+;;    `col-highlight.el' and `hl-line-plus.el'.
 ;;
 ;;  * `hl-spotlight.el', which extends `hl-line.el' by spotlighting
 ;;    the lines around the cursor.
@@ -319,7 +319,7 @@ With a prefix argument, flash for that many seconds."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(provide 'hl-line+)
+(provide 'hl-line-plus)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; hl-line+.el ends here
+;;; hl-line-plus.el ends here

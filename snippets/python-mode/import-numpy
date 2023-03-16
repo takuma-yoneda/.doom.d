@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: import numpy
+# uuid:
+# key: inp
+# condition: t
+# --
+import numpy as np

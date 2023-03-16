@@ -49,18 +49,31 @@
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
 
-(package! yapfify)
-(package! hl-line+
-  :recipe (:local-repo "lisp/hl-line-plus"))
+;; (package! yapfify)
+;; (package! hl-line-plus
+;;   :recipe (:local-repo "lisp/hl-line-plus"))
 (package! orb-hide-markers
   :recipe (:local-repo "lisp/orb-hide-markers"))
 (package! python-black)
-(package! company-tabnine)
+;; (package! company-tabnine)
 ;; (package! beacon)
 ;; (package! yascroll)
-(package! org-journal)
 (package! org-bullets)
-(package! org-download)
-(package! eldoc-box)
+;; (package! eldoc-box)
 (package! good-scroll)
-(package! ein)
+
+(package! info-colors :pin "47ee73cc19b1049eef32c9f3e264ea7ef2aaf8a5")
+(package! dash :pin "da167c51e9fd167a48d06c7c0ee8e3ac7abd9718")  ;; Temporarily used for dired-rsync
+
+(package! js-react-redux-yasnippets
+  :recipe (:host github :repo "sooqua/js-react-redux-yasnippets"))
+
+
+;; https://emacs.stackexchange.com/questions/75827/doom-emacs-error-running-hook-global-git-commit-mode-because-void-variable
+(package! transient
+      :pin "c2bdf7e12c530eb85476d3aef317eb2941ab9440"
+      :recipe (:host github :repo "magit/transient"))
+
+(package! with-editor
+          :pin "bbc60f68ac190f02da8a100b6fb67cf1c27c53ab"
+          :recipe (:host github :repo "magit/with-editor"))
