@@ -420,7 +420,19 @@
 
 ;; (setq-default truncate-lines t)
 
-(setq ispell-dictionary "en_US.multi")
+;; (setq ispell-dictionary "en_US.multi")
+(after! ispell
+  ;; find aspell and hunspell automatically
+  (setq ispell-dictionary "en_US")
+  ;; ispell-set-spellchecker-params has to be called
+  ;; before ispell-hunspell-add-multi-dic will work
+  (setq ispell-local-dictionary "en_US")
+  (setq ispell-local-dictionary-alist
+        ;; Please note the list `("-d" "en_US")` contains ACTUAL parameters passed to hunspell
+        ;; You could use `("-d" "en_US,en_US-med")` to check with multiple dictionaries
+                                        ;'(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US,fr_FR") nil utf-8) ;;eiter do this or enable guess-language
+        '(("en_US" "[[:alpha:]]" "[^[:alpha:]]" "[']" nil ("-d" "en_US") nil utf-8)
+          )))
 
 ;; Set spell-fu incorrect face
 (after! spell-fu
